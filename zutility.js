@@ -1,3 +1,12 @@
+/*!
+ * Zutility v1.0.0
+ *
+ * https://github.com/zenabus
+ *
+ * Copyright (c) 2020 Francisco Ibañez III
+ * Free to use under the MIT license.
+ */
+
 document.addEventListener("DOMContentLoaded", function () {
   'use strict';
 
@@ -40,7 +49,10 @@ document.addEventListener("DOMContentLoaded", function () {
     ti: 'text-indent',
     ls: 'letter-spacing',
     lh: 'line-height',
-    ws: 'word-spacing'
+    ws: 'word-spacing',
+    fg: 'flex-grow',
+    fsh: 'flex-shrink',
+    fb: 'flex-basis'
   }
 
   const strProps = {
@@ -55,7 +67,18 @@ document.addEventListener("DOMContentLoaded", function () {
     ta: 'text-align',
     va: 'vertical-align',
     td: 'text-decoration',
-    tt: 'text-transform'
+    tt: 'text-transform',
+    ac: 'align-content',
+    jc: 'justify-content',
+    ai: 'align-items',
+    as: 'align-self',
+    fd: 'flex-direction', 
+    fw: 'flex-wrap',
+    b: 'border',
+    bt: 'border-top',
+    br: 'border-right',
+    bb: 'border-bottom',
+    bl: 'border-left'    
   }
 
   const strVals = {
@@ -180,6 +203,70 @@ document.addEventListener("DOMContentLoaded", function () {
       u: 'uppercase',
       l: 'lowercase',
       c: 'capitalize'
+    },
+    'align-content': {
+      u: 'unset',
+      inl: 'initial',
+      int: 'inherit',
+      s: 'stretch',
+      c: 'center',
+      fs: 'flex-start',
+      fe: 'flex-end',
+      sb: 'space-between',
+      sa: 'space-around'
+    },
+    'justify-content': {
+      u: 'unset',
+      inl: 'initial',
+      int: 'inherit',
+      s: 'stretch',
+      c: 'center',
+      fs: 'flex-start',
+      fe: 'flex-end',
+      sb: 'space-between',
+      sa: 'space-around'
+    },
+    'align-items': {
+      u: 'unset',
+      inl: 'initial',
+      int: 'inherit',
+      s: 'stretch',
+      c: 'center',
+      fs: 'flex-start',
+      fe: 'flex-end',
+      b: 'baseline'
+    },
+    'align-self': {
+      u: 'unset',
+      inl: 'initial',
+      int: 'inherit',
+      s: 'stretch',
+      c: 'center',
+      fs: 'flex-start',
+      fe: 'flex-end',
+      b: 'baseline'
+    },
+    'flex-wrap': {
+      u: 'unset',
+      inl: 'initial',
+      int: 'inherit',
+    },
+    'flex-direction': {
+      u: 'unset',
+      inl: 'initial',
+      int: 'inherit',
+      nr: 'nowrap',
+      w: 'wrap',
+      wr: 'wrap-reverse'
+    },
+    'border-style': {
+      s: 'solid',
+      r: 'ridge',
+      g: 'groove',
+      i: 'inset',
+      o: 'outset',
+      n: 'none',
+      h: 'hidden'
     }
   }
 
@@ -212,21 +299,28 @@ document.addEventListener("DOMContentLoaded", function () {
   const els = document.querySelectorAll('[class*=":"]');
   for (const el of els) {
     for (const className of el.classList) {
-      if (className.indexOf(':') != -1 && (className.match(/:/g) || []).length == 1) {
-        const prop = className.split(':')[0];
-        let newProp, val = className.split(':')[1];
+      if(className.indexOf(':') != -1){
         const newClassName = window.btoa(className).replace(/=/g, '');
         el.classList.replace(className, newClassName);
 
-        if (fn.isStrProp(prop) && val.length <= 2) {
-          val = val.length <= 2 ? strVals[strProps[prop]][val] : val;
-          newProp = strProps[prop]
+        if ((className.match(/:/g) || []).length == 1) {
+          let newProp;
+          let [prop, val] = className.split(':');
+
+          if (fn.isStrProp(prop) && val.length <= 2) {
+            val = val.length <= 2 ? strVals[strProps[prop]][val] : val;
+            newProp = strProps[prop]
+          } else {
+            newProp = intProps[prop]
+          }
+
+          style.sheet.insertRule(`.${newClassName} {${newProp}: ${val}}`);
         } else {
-          newProp = intProps[prop]
+          let [prop, bwidth, bstyle, bcolor] = className.split(':');
+          if (prop.indexOf('b') == 0) {
+            style.sheet.insertRule(`.${newClassName} {${strProps[prop]}: ${bwidth} ${strVals['border-style'][bstyle]} ${bcolor}}`);
+          }
         }
-        style.sheet.insertRule(`.${newClassName} {${newProp}: ${val}}`);
-      } else {
-        console.log(className[0])
       }
     }
   }
