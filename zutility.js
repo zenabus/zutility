@@ -29,11 +29,11 @@ document.addEventListener("DOMContentLoaded", function () {
     my: 'margin-block',
     mx: 'margin-inline',
     w: 'width',
-    mnw: 'min-width',
-    mxw: 'max-width',
+    'w-': 'min-width',
+    'w+': 'max-width',
     h: 'height',
-    mnh: 'min-height',
-    mxh: 'max-height',
+    'h-': 'min-height',
+    'h+': 'max-height',
     t: 'top',
     l: 'left',
     b: 'bottom',
@@ -52,7 +52,8 @@ document.addEventListener("DOMContentLoaded", function () {
     ws: 'word-spacing',
     fg: 'flex-grow',
     fsh: 'flex-shrink',
-    fb: 'flex-basis'
+    fb: 'flex-basis',
+    zi: 'z-index'
   }
 
   const strProps = {
@@ -78,7 +79,8 @@ document.addEventListener("DOMContentLoaded", function () {
     bt: 'border-top',
     br: 'border-right',
     bb: 'border-bottom',
-    bl: 'border-left'    
+    bl: 'border-left',
+    f: 'float'
   }
 
   const strVals = {
@@ -267,6 +269,10 @@ document.addEventListener("DOMContentLoaded", function () {
       o: 'outset',
       n: 'none',
       h: 'hidden'
+    },
+    float: {
+    	r: 'right',
+    	l: 'left'
     }
   }
 
@@ -300,9 +306,8 @@ document.addEventListener("DOMContentLoaded", function () {
   for (const el of els) {
     for (const className of el.classList) {
       if(className.indexOf(':') != -1){
-        const newClassName = window.btoa(className).replace(/=/g, '');
-        el.classList.replace(className, newClassName);
-
+      	let replaceChars = {':':'\\:', '#':'\\#', '\.':'\\.', '!':'\\!'}
+        let newClassName = className.replace(/:|#|\.|!/g, char=>replaceChars[char]);
         if ((className.match(/:/g) || []).length == 1) {
           let newProp;
           let [prop, val] = className.split(':');
@@ -314,11 +319,15 @@ document.addEventListener("DOMContentLoaded", function () {
             newProp = intProps[prop]
           }
 
-          style.sheet.insertRule(`.${newClassName} {${newProp}: ${val}}`);
+        	if(className.endsWith('!')){
+						style.sheet.insertRule(`.${newClassName} {${newProp}: ${val.replace('!','')} !important}`);
+        	} else {
+        		style.sheet.insertRule(`.${newClassName} {${newProp}: ${val}}`);
+        	}
         } else {
           let [prop, bwidth, bstyle, bcolor] = className.split(':');
           if (prop.indexOf('b') == 0) {
-            style.sheet.insertRule(`.${newClassName} {${strProps[prop]}: ${bwidth} ${strVals['border-style'][bstyle]} ${bcolor}}`);
+	  				style.sheet.insertRule(`.${newClassName} {${strProps[prop]}: ${bwidth} ${strVals['border-style'][bstyle]} ${bcolor}}`);	
           }
         }
       }
