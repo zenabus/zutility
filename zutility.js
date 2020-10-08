@@ -1,5 +1,5 @@
 /*!
- * Zutility v1.0.0
+ * Zutility v1.1.0
  *
  * https://github.com/zenabus
  *
@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const style = document.createElement('style');
   document.head.appendChild(style);
 
-  const intProps = {
+  const variableProps = {
     p: 'padding',
     pt: 'padding-top',
     pr: 'padding-right',
@@ -38,57 +38,64 @@ document.addEventListener("DOMContentLoaded", function () {
     l: 'left',
     b: 'bottom',
     r: 'right',
+    bc: 'border-color',
     bg: 'background',
-    c: 'color',
-    ws: 'word-spacing',
-    ti: 'text-indent',
     br: 'border-radius',
-    fs: 'font-size',
-    fw: 'font-weight',
-    o: 'opacity',
+    c: 'color',
     ti: 'text-indent',
-    ls: 'letter-spacing',
-    lh: 'line-height',
-    ws: 'word-spacing',
+    f: 'flex',
+    fb: 'flex-basis',
     fg: 'flex-grow',
     fsh: 'flex-shrink',
-    fb: 'flex-basis',
-    zi: 'z-index'
+    ff: 'font-family',
+    fs: 'font-size',
+    fw: 'font-weight',
+    ls: 'letter-spacing',
+    lh: 'line-height',
+    o: 'opacity',
+    ws: 'word-spacing',
+    zi: 'z-index',
   }
 
-  const strProps = {
-    c: 'cursor',
-    d: 'display',
-    p: 'position',
-    f: 'flex',
-    v: 'visibility',
-    of: 'overflow',
-    ofx: 'overflow-x',
-    ofy: 'overflow-y',
-    ta: 'text-align',
-    va: 'vertical-align',
-    td: 'text-decoration',
-    tt: 'text-transform',
-    ac: 'align-content',
-    jc: 'justify-content',
-    ai: 'align-items',
-    as: 'align-self',
-    fd: 'flex-direction', 
-    fw: 'flex-wrap',
-    b: 'border',
+  const constantProps = {
+  	ac: 'align-content',
+		ai: 'align-items',
+		as: 'align-self',
+		b: 'border',
     bt: 'border-top',
     br: 'border-right',
     bb: 'border-bottom',
     bl: 'border-left',
-    f: 'float'
+    bo: 'box-sizing',
+    c: 'cursor',
+    cf: 'clear',
+    d: 'display',
+    f: 'float',
+    fd: 'flex-direction',
+    fw: 'flex-wrap',
+    jc: 'justify-content',
+    lst: 'list-style-type',
+    o: 'outline',
+    of: 'overflow',
+    ofx: 'overflow-x',
+    ofy: 'overflow-y',
+    p: 'position',
+    ta: 'text-align',
+    td: 'text-decoration',
+    tt: 'text-transform',
+    v: 'visibility',
+    va: 'vertical-align',
+    wb: 'word-break',
+    ws: 'white-space',
+    ww: 'word-wrap',
   }
 
-  const strVals = {
+  const constantVals = {
     display: {
       n: 'none',
       u: 'unset',
-      inl: 'initial',
-      int: 'inherit',
+      ini: 'initial',
+      inh: 'inherit',
       i: 'inline',
       b: 'block',
       c: 'contents',
@@ -113,8 +120,8 @@ document.addEventListener("DOMContentLoaded", function () {
     position: {
       n: 'none',
       u: 'unset',
-      inl: 'initial',
-      int: 'inherit',
+      ini: 'initial',
+      inh: 'inherit',
       s: 'static',
       a: 'absolute',
       f: 'fixed',
@@ -160,8 +167,8 @@ document.addEventListener("DOMContentLoaded", function () {
     },
     visibility: {
       u: 'unset',
-      inl: 'initial',
-      int: 'inherit',
+      ini: 'initial',
+      inh: 'inherit',
       v: 'visible',
       h: 'hidden',
       c: 'collapse'
@@ -208,8 +215,8 @@ document.addEventListener("DOMContentLoaded", function () {
     },
     'align-content': {
       u: 'unset',
-      inl: 'initial',
-      int: 'inherit',
+      ini: 'initial',
+      inh: 'inherit',
       s: 'stretch',
       c: 'center',
       fs: 'flex-start',
@@ -219,8 +226,8 @@ document.addEventListener("DOMContentLoaded", function () {
     },
     'justify-content': {
       u: 'unset',
-      inl: 'initial',
-      int: 'inherit',
+      ini: 'initial',
+      inh: 'inherit',
       s: 'stretch',
       c: 'center',
       fs: 'flex-start',
@@ -230,8 +237,8 @@ document.addEventListener("DOMContentLoaded", function () {
     },
     'align-items': {
       u: 'unset',
-      inl: 'initial',
-      int: 'inherit',
+      ini: 'initial',
+      inh: 'inherit',
       s: 'stretch',
       c: 'center',
       fs: 'flex-start',
@@ -240,8 +247,8 @@ document.addEventListener("DOMContentLoaded", function () {
     },
     'align-self': {
       u: 'unset',
-      inl: 'initial',
-      int: 'inherit',
+      ini: 'initial',
+      inh: 'inherit',
       s: 'stretch',
       c: 'center',
       fs: 'flex-start',
@@ -250,13 +257,13 @@ document.addEventListener("DOMContentLoaded", function () {
     },
     'flex-wrap': {
       u: 'unset',
-      inl: 'initial',
-      int: 'inherit',
+      ini: 'initial',
+      inh: 'inherit',
     },
     'flex-direction': {
       u: 'unset',
-      inl: 'initial',
-      int: 'inherit',
+      ini: 'initial',
+      inh: 'inherit',
       nr: 'nowrap',
       w: 'wrap',
       wr: 'wrap-reverse'
@@ -273,32 +280,77 @@ document.addEventListener("DOMContentLoaded", function () {
     float: {
     	r: 'right',
     	l: 'left'
+    },
+    'list-style-type': {
+    	n: 'none',
+    	d: 'disc',
+    	c: 'circle',
+    	s: 'square',
+    	d: 'decimal',
+    	dlz: 'decimal-leading-zero',
+			a: 'armenian',
+			g: 'georgian',
+			la: 'lower-alpha',
+			ua: 'upper-alpha',
+			lg: 'lower-greek',
+			ll: 'lower-latin',
+			ul: 'upper-latin',
+			lr: 'lower-roman',
+			ur: 'upper-roman',
+			inh: 'inherit'
+    },
+    outline: {
+    	n: 'none'
+    },
+    'word-break': {
+    	n: 'normal',
+    	ba: 'break-all',
+    	ka: 'keep-all',
+    	ini: 'initial',
+      inh: 'inherit'
+    },
+    'word-wrap':{
+    	n: 'normal',
+    	bw: 'break-word',
+    	ini: 'initial',
+      inh: 'inherit'
+    },
+    'white-space': {
+    	n: 'normal',
+    	p: 'pre',
+    	nw: 'nowrap',
+    	pl: 'pre-line',
+    	pw: 'pre-wrap',
+    	ini: 'initial',
+    	inh: 'inherit'
+    },
+    'box-sizing': {
+    	cb: 'content-box',
+    	pb: 'padding-box',
+    	bb: 'border-box',
+    	ini: 'initial',
+    	inh: 'inherit'
+    },
+    clear: {
+    	l: 'left',
+    	r: 'right',
+    	a: 'auto',
+    	b: 'both',
+    	n: 'none',
+    	ini: 'initial',
+    	inh: 'inherit'
     }
   }
 
   const fn = {
-    styleExist: (selector) => {
-      for (const iterator of style.sheet.rules) {
-        return selector === iterator.selectorText ? true : false;
-      }
-    },
-    isStrProp: (prop) => {
-      let str = false;
-      for (const key in strProps) {
+    isConstantProp: (prop) => {
+      let constant = false;
+      for (const key in constantProps) {
         if (key == prop) {
-          str = true;
+          constant = true;
         }
       }
-      return str;
-    },
-    isStrVal: (val, prop) => {
-      let str = false;
-      for (const key in strVals[prop]) {
-        if (key == val) {
-          str = true;
-        }
-      }
-      return str;
+      return constant;
     }
   }
 
@@ -311,23 +363,21 @@ document.addEventListener("DOMContentLoaded", function () {
         if ((className.match(/:/g) || []).length == 1) {
           let newProp;
           let [prop, val] = className.split(':');
+          let newVal;
 
-          if (fn.isStrProp(prop) && val.length <= 2) {
-            val = val.length <= 2 ? strVals[strProps[prop]][val] : val;
-            newProp = strProps[prop]
+          if (fn.isConstantProp(prop) && val.length <= 2 && !val.startsWith('.')) {
+            val = val.length <= 2 ? constantVals[constantProps[prop]][val] : val;
+            newProp = constantProps[prop]
           } else {
-            newProp = intProps[prop]
+            newProp = variableProps[prop]
           }
 
-        	if(className.endsWith('!')){
-						style.sheet.insertRule(`.${newClassName} {${newProp}: ${val.replace('!','')} !important}`);
-        	} else {
-        		style.sheet.insertRule(`.${newClassName} {${newProp}: ${val}}`);
-        	}
+          newVal = className.endsWith('!') ? `${val.replace('!',' !important')}` : val;
+        	style.sheet.insertRule(`.${newClassName} {${newProp}: ${newVal}}`);
         } else {
           let [prop, bwidth, bstyle, bcolor] = className.split(':');
           if (prop.indexOf('b') == 0) {
-	  				style.sheet.insertRule(`.${newClassName} {${strProps[prop]}: ${bwidth} ${strVals['border-style'][bstyle]} ${bcolor}}`);	
+	  				style.sheet.insertRule(`.${newClassName} {${constantProps[prop]}: ${bwidth} ${constantVals['border-style'][bstyle]} ${bcolor}}`);
           }
         }
       }
