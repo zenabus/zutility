@@ -1,17 +1,55 @@
 /*!
- * Zutility v1.1.1
+ * Zutility v1.1.2
  *
  * https://github.com/zenabus
  *
  * Copyright (c) 2020 Francisco Ibañez III
  * Free to use under the MIT license.
  */
-
+ 
 document.addEventListener("DOMContentLoaded", function () {
   'use strict';
 
-  const style = document.createElement('style');
-  document.head.appendChild(style);
+  // insertRule Polyfill
+  (function(Sheet_proto){
+    var originalInsertRule = Sheet_proto.insertRule;
+
+    if (originalInsertRule.length === 2){ // 2 mandatory arguments: (selector, rules)
+      Sheet_proto.insertRule = function(selectorAndRule){
+        // First, separate the selector from the rule
+        a: for (var i=0, Len=selectorAndRule.length, isEscaped=0, newCharCode=0; i !== Len; ++i) {
+          newCharCode = selectorAndRule.charCodeAt(i);
+          if (!isEscaped && (newCharCode === 123)) { // 123 = "{".charCodeAt(0)
+            // Secondly, find the last closing bracket
+            var openBracketPos = i, closeBracketPos = -1;
+
+            for (; i !== Len; ++i) {
+              newCharCode = selectorAndRule.charCodeAt(i);
+              if (!isEscaped && (newCharCode === 125)) { // 125 = "}".charCodeAt(0)
+                closeBracketPos = i;
+              }
+              isEscaped ^= newCharCode===92?1:isEscaped; // 92 = "\\".charCodeAt(0)
+            }
+
+            if (closeBracketPos === -1) break a; // No closing bracket was found!
+              /*else*/ return originalInsertRule.call(
+              this, // the sheet to be changed
+              selectorAndRule.substring(0, openBracketPos), // The selector
+              selectorAndRule.substring(closeBracketPos), // The rule
+              arguments[3] // The insert index
+            );
+          }
+
+          // Works by if the char code is a backslash, then isEscaped
+          // gets flipped (XOR-ed by 1), and if it is not a backslash
+          // then isEscaped gets XORed by itself, zeroing it
+          isEscaped ^= newCharCode===92?1:isEscaped; // 92 = "\\".charCodeAt(0)
+        }
+        // Else, there is no unescaped bracket
+        return originalInsertRule.call(this, selectorAndRule, "", arguments[2]);
+      };
+    }
+  })(CSSStyleSheet.prototype);
 
   const variableProps = {
     p: 'padding',
@@ -342,8 +380,11 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
+  const style = document.createElement('style');
+  document.head.appendChild(style);
+
   const fn = {
-    styleExist: (selector) => {
+    ruleExist: (selector) => {
       for (const iterator of style.sheet.rules) {
       	if(selector == iterator.selectorText){
       		return true;
@@ -370,7 +411,6 @@ document.addEventListener("DOMContentLoaded", function () {
         if ((className.match(/:/g) || []).length == 1) {
           let newProp;
           let [prop, val] = className.split(':');
-          let newVal;
 
           if (fn.isConstantProp(prop) && val.length <= 2 && !val.startsWith('.')) {
             val = val.length <= 2 ? constantVals[constantProps[prop]][val] : val;
@@ -379,14 +419,14 @@ document.addEventListener("DOMContentLoaded", function () {
             newProp = variableProps[prop]
           }
 
-          newVal = className.endsWith('!') ? `${val.replace('!',' !important')}` : val;
-          if(!fn.styleExist(`.${newClassName}`)){
-          	style.sheet.insertRule(`.${newClassName} {${newProp}: ${newVal}}`);	
+          val = className.endsWith('!') ? `${val.replace('!',' !important')}` : val;
+          if(!fn.ruleExist(`.${newClassName}`)){
+          	style.sheet.insertRule(`.${newClassName} {${newProp}: ${val}}`);
           }
         } else {
           let [prop, bwidth, bstyle, bcolor] = className.split(':');
           if (prop.indexOf('b') == 0) {
-          	if(!fn.styleExist(`.${newClassName}`)){
+          	if(!fn.ruleExist(`.${newClassName}`)){
 		  				style.sheet.insertRule(`.${newClassName} {${constantProps[prop]}: ${bwidth} ${constantVals['border-style'][bstyle]} ${bcolor}}`);
 		  			}
           }
