@@ -3,8 +3,8 @@
 
 <p align="center">A simple and light-weight JavaScript-based CSS utility library.</p>
 <p align="center">
-  <img src="https://svgshare.com/i/QMW.svg" />
-  <img src="https://svgshare.com/i/QN4.svg" />
+  <img src="https://img.shields.io/badge/js%20minified-5.43kb-green" />
+  <img src="https://img.shields.io/badge/js-10.6kb-blue" />
 </p>
 
 ## Usage
