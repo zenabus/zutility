@@ -1,38 +1,41 @@
 /*!
- * Zutility v1.1.2
+ * Zutility v1.2.0
  *
  * https://github.com/zenabus
  *
  * Copyright (c) 2020 Francisco Ibañez III
  * Free to use under the MIT license.
  */
- 
+
 document.addEventListener("DOMContentLoaded", function () {
   'use strict';
 
   // insertRule Polyfill
-  (function(Sheet_proto){
+  // https://developer.mozilla.org/en-US/docs/Web/API/CSSStyleSheet/insertRule#Polyfill
+  (function (Sheet_proto) {
     var originalInsertRule = Sheet_proto.insertRule;
 
-    if (originalInsertRule.length === 2){ // 2 mandatory arguments: (selector, rules)
-      Sheet_proto.insertRule = function(selectorAndRule){
+    if (originalInsertRule.length === 2) { // 2 mandatory arguments: (selector, rules)
+      Sheet_proto.insertRule = function (selectorAndRule) {
         // First, separate the selector from the rule
-        a: for (var i=0, Len=selectorAndRule.length, isEscaped=0, newCharCode=0; i !== Len; ++i) {
+        a: for (var i = 0, Len = selectorAndRule.length, isEscaped = 0, newCharCode = 0; i !== Len; ++i) {
           newCharCode = selectorAndRule.charCodeAt(i);
           if (!isEscaped && (newCharCode === 123)) { // 123 = "{".charCodeAt(0)
             // Secondly, find the last closing bracket
-            var openBracketPos = i, closeBracketPos = -1;
+            var openBracketPos = i,
+              closeBracketPos = -1;
 
             for (; i !== Len; ++i) {
               newCharCode = selectorAndRule.charCodeAt(i);
               if (!isEscaped && (newCharCode === 125)) { // 125 = "}".charCodeAt(0)
                 closeBracketPos = i;
               }
-              isEscaped ^= newCharCode===92?1:isEscaped; // 92 = "\\".charCodeAt(0)
+              isEscaped ^= newCharCode === 92 ? 1 : isEscaped; // 92 = "\\".charCodeAt(0)
             }
 
             if (closeBracketPos === -1) break a; // No closing bracket was found!
-              /*else*/ return originalInsertRule.call(
+            /*else*/
+            return originalInsertRule.call(
               this, // the sheet to be changed
               selectorAndRule.substring(0, openBracketPos), // The selector
               selectorAndRule.substring(closeBracketPos), // The rule
@@ -43,7 +46,7 @@ document.addEventListener("DOMContentLoaded", function () {
           // Works by if the char code is a backslash, then isEscaped
           // gets flipped (XOR-ed by 1), and if it is not a backslash
           // then isEscaped gets XORed by itself, zeroing it
-          isEscaped ^= newCharCode===92?1:isEscaped; // 92 = "\\".charCodeAt(0)
+          isEscaped ^= newCharCode === 92 ? 1 : isEscaped; // 92 = "\\".charCodeAt(0)
         }
         // Else, there is no unescaped bracket
         return originalInsertRule.call(this, selectorAndRule, "", arguments[2]);
@@ -51,7 +54,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   })(CSSStyleSheet.prototype);
 
-  const variableProps = {
+  const VARIABLE_PROPS = {
     p: 'padding',
     pt: 'padding-top',
     pr: 'padding-right',
@@ -95,11 +98,11 @@ document.addEventListener("DOMContentLoaded", function () {
     zi: 'z-index',
   }
 
-  const constantProps = {
-  	ac: 'align-content',
-		ai: 'align-items',
-		as: 'align-self',
-		b: 'border',
+  const CONSTANT_PROPS = {
+    ac: 'align-content',
+    ai: 'align-items',
+    as: 'align-self',
+    b: 'border',
     bt: 'border-top',
     br: 'border-right',
     bb: 'border-bottom',
@@ -128,7 +131,7 @@ document.addEventListener("DOMContentLoaded", function () {
     ww: 'word-wrap',
   }
 
-  const constantVals = {
+  const CONSTANT_VALS = {
     display: {
       n: 'none',
       u: 'unset',
@@ -316,69 +319,220 @@ document.addEventListener("DOMContentLoaded", function () {
       h: 'hidden'
     },
     float: {
-    	r: 'right',
-    	l: 'left'
+      r: 'right',
+      l: 'left'
     },
     'list-style-type': {
-    	n: 'none',
-    	d: 'disc',
-    	c: 'circle',
-    	s: 'square',
-    	d: 'decimal',
-    	dlz: 'decimal-leading-zero',
-			a: 'armenian',
-			g: 'georgian',
-			la: 'lower-alpha',
-			ua: 'upper-alpha',
-			lg: 'lower-greek',
-			ll: 'lower-latin',
-			ul: 'upper-latin',
-			lr: 'lower-roman',
-			ur: 'upper-roman',
-			inh: 'inherit'
-    },
-    outline: {
-    	n: 'none'
-    },
-    'word-break': {
-    	n: 'normal',
-    	ba: 'break-all',
-    	ka: 'keep-all',
-    	ini: 'initial',
+      n: 'none',
+      d: 'disc',
+      c: 'circle',
+      s: 'square',
+      d: 'decimal',
+      dlz: 'decimal-leading-zero',
+      a: 'armenian',
+      g: 'georgian',
+      la: 'lower-alpha',
+      ua: 'upper-alpha',
+      lg: 'lower-greek',
+      ll: 'lower-latin',
+      ul: 'upper-latin',
+      lr: 'lower-roman',
+      ur: 'upper-roman',
       inh: 'inherit'
     },
-    'word-wrap':{
-    	n: 'normal',
-    	bw: 'break-word',
-    	ini: 'initial',
+    outline: {
+      n: 'none'
+    },
+    'word-break': {
+      n: 'normal',
+      ba: 'break-all',
+      ka: 'keep-all',
+      ini: 'initial',
+      inh: 'inherit'
+    },
+    'word-wrap': {
+      n: 'normal',
+      bw: 'break-word',
+      ini: 'initial',
       inh: 'inherit'
     },
     'white-space': {
-    	n: 'normal',
-    	p: 'pre',
-    	nw: 'nowrap',
-    	pl: 'pre-line',
-    	pw: 'pre-wrap',
-    	ini: 'initial',
-    	inh: 'inherit'
+      n: 'normal',
+      p: 'pre',
+      nw: 'nowrap',
+      pl: 'pre-line',
+      pw: 'pre-wrap',
+      ini: 'initial',
+      inh: 'inherit'
     },
     'box-sizing': {
-    	cb: 'content-box',
-    	pb: 'padding-box',
-    	bb: 'border-box',
-    	ini: 'initial',
-    	inh: 'inherit'
+      cb: 'content-box',
+      pb: 'padding-box',
+      bb: 'border-box',
+      ini: 'initial',
+      inh: 'inherit'
     },
     clear: {
-    	l: 'left',
-    	r: 'right',
-    	a: 'auto',
-    	b: 'both',
-    	n: 'none',
-    	ini: 'initial',
-    	inh: 'inherit'
+      l: 'left',
+      r: 'right',
+      a: 'auto',
+      b: 'both',
+      n: 'none',
+      ini: 'initial',
+      inh: 'inherit'
     }
   }
+
+  const CSS_COLORS = [
+    "AliceBlue",
+    "AntiqueWhite",
+    "Aqua",
+    "Aquamarine",
+    "Azure",
+    "Beige",
+    "Bisque",
+    "Black",
+    "BlanchedAlmond",
+    "Blue",
+    "BlueViolet",
+    "Brown",
+    "BurlyWood",
+    "CadetBlue",
+    "Chartreuse",
+    "Chocolate",
+    "Coral",
+    "CornflowerBlue",
+    "Cornsilk",
+    "Crimson",
+    "Cyan",
+    "DarkBlue",
+    "DarkCyan",
+    "DarkGoldenRod",
+    "DarkGray",
+    "DarkGrey",
+    "DarkGreen",
+    "DarkKhaki",
+    "DarkMagenta",
+    "DarkOliveGreen",
+    "DarkOrange",
+    "DarkOrchid",
+    "DarkRed",
+    "DarkSalmon",
+    "DarkSeaGreen",
+    "DarkSlateBlue",
+    "DarkSlateGray",
+    "DarkSlateGrey",
+    "DarkTurquoise",
+    "DarkViolet",
+    "DeepPink",
+    "DeepSkyBlue",
+    "DimGray",
+    "DimGrey",
+    "DodgerBlue",
+    "FireBrick",
+    "FloralWhite",
+    "ForestGreen",
+    "Fuchsia",
+    "Gainsboro",
+    "GhostWhite",
+    "Gold",
+    "GoldenRod",
+    "Gray",
+    "Grey",
+    "Green",
+    "GreenYellow",
+    "HoneyDew",
+    "HotPink",
+    "IndianRed",
+    "Indigo",
+    "Ivory",
+    "Khaki",
+    "Lavender",
+    "LavenderBlush",
+    "LawnGreen",
+    "LemonChiffon",
+    "LightBlue",
+    "LightCoral",
+    "LightCyan",
+    "LightGoldenRodYellow",
+    "LightGray",
+    "LightGrey",
+    "LightGreen",
+    "LightPink",
+    "LightSalmon",
+    "LightSeaGreen",
+    "LightSkyBlue",
+    "LightSlateGray",
+    "LightSlateGrey",
+    "LightSteelBlue",
+    "LightYellow",
+    "Lime",
+    "LimeGreen",
+    "Linen",
+    "Magenta",
+    "Maroon",
+    "MediumAquaMarine",
+    "MediumBlue",
+    "MediumOrchid",
+    "MediumPurple",
+    "MediumSeaGreen",
+    "MediumSlateBlue",
+    "MediumSpringGreen",
+    "MediumTurquoise",
+    "MediumVioletRed",
+    "MidnightBlue",
+    "MintCream",
+    "MistyRose",
+    "Moccasin",
+    "NavajoWhite",
+    "Navy",
+    "OldLace",
+    "Olive",
+    "OliveDrab",
+    "Orange",
+    "OrangeRed",
+    "Orchid",
+    "PaleGoldenRod",
+    "PaleGreen",
+    "PaleTurquoise",
+    "PaleVioletRed",
+    "PapayaWhip",
+    "PeachPuff",
+    "Peru",
+    "Pink",
+    "Plum",
+    "PowderBlue",
+    "Purple",
+    "RebeccaPurple",
+    "Red",
+    "RosyBrown",
+    "RoyalBlue",
+    "SaddleBrown",
+    "Salmon",
+    "SandyBrown",
+    "SeaGreen",
+    "SeaShell",
+    "Sienna",
+    "Silver",
+    "SkyBlue",
+    "SlateBlue",
+    "SlateGray",
+    "SlateGrey",
+    "Snow",
+    "SpringGreen",
+    "SteelBlue",
+    "Tan",
+    "Teal",
+    "Thistle",
+    "Tomato",
+    "Turquoise",
+    "Violet",
+    "Wheat",
+    "White",
+    "WhiteSmoke",
+    "Yellow",
+    "YellowGreen",
+  ];
 
   const style = document.createElement('style');
   document.head.appendChild(style);
@@ -386,50 +540,65 @@ document.addEventListener("DOMContentLoaded", function () {
   const fn = {
     ruleExist: (selector) => {
       for (const iterator of style.sheet.rules) {
-      	if(selector == iterator.selectorText){
-      		return true;
-      	}
+        if (selector == iterator.selectorText) {
+          return true;
+        }
       }
     },
-    isConstantProp: (prop) => {
+    isConstantProp: (prop, val) => {
       let constant = false;
-      for (const key in constantProps) {
-        if (key == prop) {
+      for (const key in CONSTANT_PROPS) {
+        if (key == prop && !val.startsWith('.') && !fn.isColor(val) && !fn.containsUnit(val)) {
           constant = true;
         }
       }
       return constant;
+    },
+    isColor: (val) => {
+      return CSS_COLORS.map(c => c.toLowerCase()).includes(val.replace('!', ''));
+    },
+    containsUnit: (val) => {
+      if (val == 'ini' || val == 'inh') {
+        return false;
+      } else {
+        const regex = /\.|#|em|ex|ch|rem|vw|vh|vmin|vmax|%|cm|mm|in|px|pt|pc/g;
+        return (val.match(regex) || []).length != 0;
+      }
+    },
+    insertRule: (cn, prop, val) => {
+      style.sheet.insertRule(`.${cn} {${prop}: ${val}}`);
     }
   }
 
   const els = document.querySelectorAll('[class*=":"]');
+
   for (const el of els) {
-    for (const className of el.classList) {
-      if(className.indexOf(':') != -1){
-      	let replaceChars = {':':'\\:', '#':'\\#', '\.':'\\.', '!':'\\!'}
-        let newClassName = className.replace(/:|#|\.|!/g, char=>replaceChars[char]);
-        if ((className.match(/:/g) || []).length == 1) {
+    for (let className of el.classList) {
+      className = className.toLowerCase();
+      const isNormal = (className.match(/:/g) || []).length == 1;
+      const isBorder = (className.match(/:/g) || []).length == 3 && className.split(':')[0].indexOf('b') == 0;
+
+      if (className.indexOf(':') != -1) {
+        const replaceChars = {':': '\\:', '#': '\\#', '\.': '\\.', '!': '\\!'}
+        const newClassName = className.replace(/:|#|\.|!/g, char => replaceChars[char]);
+
+        if (isNormal) {
           let newProp;
           let [prop, val] = className.split(':');
 
-          if (fn.isConstantProp(prop) && val.length <= 2 && !val.startsWith('.')) {
-            val = val.length <= 2 ? constantVals[constantProps[prop]][val] : val;
-            newProp = constantProps[prop]
+          if (fn.isConstantProp(prop, val)) {
+            val = CONSTANT_VALS[CONSTANT_PROPS[prop]][val];
+            newProp = CONSTANT_PROPS[prop];
           } else {
-            newProp = variableProps[prop]
+            newProp = VARIABLE_PROPS[prop];
           }
 
           val = className.endsWith('!') ? `${val.replace('!',' !important')}` : val;
-          if(!fn.ruleExist(`.${newClassName}`)){
-          	style.sheet.insertRule(`.${newClassName} {${newProp}: ${val}}`);
-          }
-        } else {
-          let [prop, bwidth, bstyle, bcolor] = className.split(':');
-          if (prop.indexOf('b') == 0) {
-          	if(!fn.ruleExist(`.${newClassName}`)){
-		  				style.sheet.insertRule(`.${newClassName} {${constantProps[prop]}: ${bwidth} ${constantVals['border-style'][bstyle]} ${bcolor}}`);
-		  			}
-          }
+          !fn.ruleExist(`.${newClassName}`) && fn.insertRule(newClassName, newProp, val);
+        } else if (isBorder) {
+          const [prop, bwidth, bstyle, bcolor] = className.split(':');
+          const val = `${bwidth} ${CONSTANT_VALS['border-style'][bstyle]} ${bcolor}`;
+          !fn.ruleExist(`.${newClassName}`) && fn.insertRule(newClassName, CONSTANT_PROPS[prop], val);
         }
       }
     }
