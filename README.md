@@ -113,6 +113,9 @@ Use ini for initial and inh for inherit values.
 [Live demo at CodePen.io](https://codepen.io/zenabus/pen/) [in progress]
 
 ## Changelog
+### v1.1.1 - 2020-10-09:
+- removed duplicate CSS classes.
+
 ### v1.1.0 - 2020-10-09:
 - changed the generated CSS class names.
 - added new CSS properties to zutility.js.

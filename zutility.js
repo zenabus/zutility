@@ -1,5 +1,5 @@
 /*!
- * Zutility v1.1.0
+ * Zutility v1.1.1
  *
  * https://github.com/zenabus
  *
@@ -343,6 +343,13 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   const fn = {
+    styleExist: (selector) => {
+      for (const iterator of style.sheet.rules) {
+      	if(selector == iterator.selectorText){
+      		return true;
+      	}
+      }
+    },
     isConstantProp: (prop) => {
       let constant = false;
       for (const key in constantProps) {
@@ -373,11 +380,15 @@ document.addEventListener("DOMContentLoaded", function () {
           }
 
           newVal = className.endsWith('!') ? `${val.replace('!',' !important')}` : val;
-        	style.sheet.insertRule(`.${newClassName} {${newProp}: ${newVal}}`);
+          if(!fn.styleExist(`.${newClassName}`)){
+          	style.sheet.insertRule(`.${newClassName} {${newProp}: ${newVal}}`);	
+          }
         } else {
           let [prop, bwidth, bstyle, bcolor] = className.split(':');
           if (prop.indexOf('b') == 0) {
-	  				style.sheet.insertRule(`.${newClassName} {${constantProps[prop]}: ${bwidth} ${constantVals['border-style'][bstyle]} ${bcolor}}`);
+          	if(!fn.styleExist(`.${newClassName}`)){
+		  				style.sheet.insertRule(`.${newClassName} {${constantProps[prop]}: ${bwidth} ${constantVals['border-style'][bstyle]} ${bcolor}}`);
+		  			}
           }
         }
       }
