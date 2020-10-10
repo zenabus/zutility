@@ -3,8 +3,8 @@
 
 <p align="center">A simple and light-weight JavaScript-based CSS utility library.</p>
 <p align="center">
-  <img src="https://img.shields.io/badge/js%20minified-7.34kb-green" />
-  <img src="https://img.shields.io/badge/js-13.9kb-blue" />
+  <img src="https://img.shields.io/badge/js%20minified-8.16kb-green" />
+  <img src="https://img.shields.io/badge/js-15.4kb-blue" />
 </p>
 
 ## Usage
@@ -24,6 +24,16 @@ Properties with variable value:
 Properties with constant value:
 ````html
 <div class="p:a"></div> // position: absolute;
+````
+
+Properties with media !important rule:
+````html
+<div class="b:1px:s:black!"></div> // border: 1px solid black !important;
+````
+
+Properties with media query:
+````html
+<div class="@md:p:a"></div> // @media (max-width: 992px) { .class { position: absolute; } }
 ````
 ## List of classes
 
@@ -113,6 +123,10 @@ Use ini for initial and inh for inherit values.
 [Live demo at CodePen.io](https://codepen.io/zenabus/pen/) [in progress]
 
 ## Changelog
+### v1.3.0 - 2020-10-11:
+- added media queries.
+- refactored code to make it more readable.
+
 ### v1.2.0 - 2020-10-10:
 - optimized code readability.
 

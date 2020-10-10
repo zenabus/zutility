@@ -1,5 +1,5 @@
 /*!
- * Zutility v1.2.0
+ * Zutility v1.3.0
  *
  * https://github.com/zenabus
  *
@@ -98,15 +98,18 @@ document.addEventListener("DOMContentLoaded", function () {
     zi: 'z-index',
   }
 
-  const CONSTANT_PROPS = {
-    ac: 'align-content',
-    ai: 'align-items',
-    as: 'align-self',
+  const BORDER_PROPS = {
     b: 'border',
     bt: 'border-top',
     br: 'border-right',
     bb: 'border-bottom',
-    bl: 'border-left',
+    bl: 'border-left'
+  }
+
+  const CONSTANT_PROPS = {
+    ac: 'align-content',
+    ai: 'align-items',
+    as: 'align-self',
     bo: 'box-sizing',
     c: 'cursor',
     cf: 'clear',
@@ -534,71 +537,99 @@ document.addEventListener("DOMContentLoaded", function () {
     "YellowGreen",
   ];
 
-  const style = document.createElement('style');
-  document.head.appendChild(style);
+  const MEDIA_QUERIES = {
+    'xs': 'max-width: 576px',
+    'sm': 'max-width: 768px',
+    'md': 'max-width: 992px',
+    'lg': 'max-width: 1200px',
+    'xl': 'min-width: 1200px'
+  }
 
   const fn = {
-    ruleExist: (selector) => {
-      for (const iterator of style.sheet.rules) {
-        if (selector == iterator.selectorText) {
-          return true;
-        }
-      }
-    },
-    isConstantProp: (prop, val) => {
+    isPropConstant: (prop, val) => {
       let constant = false;
-      for (const key in CONSTANT_PROPS) {
-        if (key == prop && !val.startsWith('.') && !fn.isColor(val) && !fn.containsUnit(val)) {
-          constant = true;
-        }
+      if (Object.keys(CONSTANT_PROPS).indexOf(prop) > -1 && !val.startsWith('.') && !fn.isValColor(val) && !fn.containsUnit(val)) {
+        constant = true;
       }
       return constant;
     },
-    isColor: (val) => {
-      return CSS_COLORS.map(c => c.toLowerCase()).includes(val.replace('!', ''));
-    },
+    isPropBorder: (prop) => Object.keys(BORDER_PROPS).indexOf(prop) > -1,
+    isClassNormal: (cn) => (cn.match(/:/g) || []).length == 1,
+    isClassBorder: (cn) => (cn.match(/:/g) || []).length == 3 && cn.split(':')[0].indexOf('b') == 0,
+    isClassMedia: (cn) => cn.startsWith('@'),
+    isValColor: (val) => CSS_COLORS.map(c => c.toLowerCase()).includes(val.replace('!', '')),
+    isValImportant: (val) => val.endsWith('!') ? [val.slice(0, -1), true] : [val, false],
     containsUnit: (val) => {
       if (val == 'ini' || val == 'inh') {
         return false;
       } else {
         const regex = /\.|#|em|ex|ch|rem|vw|vh|vmin|vmax|%|cm|mm|in|px|pt|pc/g;
-        return (val.match(regex) || []).length != 0;
+        return (val.match(regex) || '').length != 0;
       }
     },
-    insertRule: (cn, prop, val) => {
-      style.sheet.insertRule(`.${cn} {${prop}: ${val}}`);
+    getValAndProp: (prop, val, cn) => {
+      if (fn.isPropConstant(prop, val)) {
+        val = CONSTANT_VALS[CONSTANT_PROPS[prop]][val];
+        prop = CONSTANT_PROPS[prop];
+      } else if (fn.isClassBorder(cn) || fn.isPropBorder(prop) && fn.isClassMedia(cn.substr(1))) {
+        prop = BORDER_PROPS[prop];
+      } else {
+        prop = VARIABLE_PROPS[prop];
+      }
+      return [val, prop];
+    },
+    insertRule: (cn, prop, val, mq = false) => {
+      let isImportant;
+      [val, isImportant] = fn.isValImportant(val);
+      [val, prop] = fn.getValAndProp(prop, val, cn);
+      val = isImportant ? `${val} !important` : val;
+
+      if (!mq) {
+        style.sheet.insertRule(`.${cn} {${prop}: ${val}}`);
+      } else {
+        style.sheet.insertRule(`@media (${mq}) {.${cn} {${prop}: ${val}; }}`);
+      }
+    },
+    ruleExist: (selector) => {
+      for (const iterator of style.sheet.rules) {
+        const isMediaRule = iterator.cssRules != undefined;
+        if (isMediaRule && selector == iterator.cssRules[0].selectorText) {
+          return true;
+        } else if (selector == iterator.selectorText) {
+          return true;
+        }
+      }
     }
   }
 
+  const style = document.createElement('style');
+  document.head.appendChild(style);
   const els = document.querySelectorAll('[class*=":"]');
 
   for (const el of els) {
     for (let className of el.classList) {
       className = className.toLowerCase();
-      const isNormal = (className.match(/:/g) || []).length == 1;
-      const isBorder = (className.match(/:/g) || []).length == 3 && className.split(':')[0].indexOf('b') == 0;
 
       if (className.indexOf(':') != -1) {
-        const replaceChars = {':': '\\:', '#': '\\#', '\.': '\\.', '!': '\\!'}
-        const newClassName = className.replace(/:|#|\.|!/g, char => replaceChars[char]);
+        const replaceChars = {':': '\\:', '#': '\\#', '\.': '\\.', '!': '\\!', '@': '\\@'}
+        const newClassName = className.replace(/:|#|\.|!|@/g, char => replaceChars[char]);
 
-        if (isNormal) {
-          let newProp;
-          let [prop, val] = className.split(':');
-
-          if (fn.isConstantProp(prop, val)) {
-            val = CONSTANT_VALS[CONSTANT_PROPS[prop]][val];
-            newProp = CONSTANT_PROPS[prop];
+        if (fn.isClassMedia(className)) {
+          if (fn.isClassNormal(className.substr(4))) {
+            const [mediaRule, prop, val] = className.split(':');
           } else {
-            newProp = VARIABLE_PROPS[prop];
+            const [mediaRule, prop, bwidth, bstyle, bcolor] = className.split(':');
+            const val = `${bwidth} ${CONSTANT_VALS['border-style'][bstyle]} ${bcolor}`;
           }
-
-          val = className.endsWith('!') ? `${val.replace('!',' !important')}` : val;
-          !fn.ruleExist(`.${newClassName}`) && fn.insertRule(newClassName, newProp, val);
-        } else if (isBorder) {
+          const mediaQuery = MEDIA_QUERIES[mediaRule.substr(1)];
+          !fn.ruleExist(`.${newClassName}`) && fn.insertRule(newClassName, prop, val, mediaQuery);
+        } else if (fn.isClassNormal(className)) {
+          const [prop, val] = className.split(':');
+          !fn.ruleExist(`.${newClassName}`) && fn.insertRule(newClassName, prop, val);
+        } else if (fn.isClassBorder(className)) {
           const [prop, bwidth, bstyle, bcolor] = className.split(':');
           const val = `${bwidth} ${CONSTANT_VALS['border-style'][bstyle]} ${bcolor}`;
-          !fn.ruleExist(`.${newClassName}`) && fn.insertRule(newClassName, CONSTANT_PROPS[prop], val);
+          !fn.ruleExist(`.${newClassName}`) && fn.insertRule(newClassName, prop, val);
         }
       }
     }
