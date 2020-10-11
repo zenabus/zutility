@@ -3,8 +3,8 @@
 
 <p align="center">A simple and light-weight JavaScript-based CSS utility library.</p>
 <p align="center">
-  <img src="https://img.shields.io/badge/js%20minified-8.16kb-green" />
-  <img src="https://img.shields.io/badge/js-15.4kb-blue" />
+  <img src="https://img.shields.io/badge/js%20minified-8.68kb-green" />
+  <img src="https://img.shields.io/badge/js-16.0kb-blue" />
 </p>
 
 ## Usage
@@ -123,6 +123,10 @@ Use ini for initial and inh for inherit values.
 [Live demo at CodePen.io](https://codepen.io/zenabus/pen/) [in progress]
 
 ## Changelog
+### v1.3.0 - 2020-10-12:
+- changed the order of media query and regular CSS.
+- added media query between device widths.
+
 ### v1.3.0 - 2020-10-11:
 - added media queries.
 - refactored code to make it more readable.
