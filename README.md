@@ -123,7 +123,7 @@ Use ini for initial and inh for inherit values.
 [Live demo at CodePen.io](https://codepen.io/zenabus/pen/) [in progress]
 
 ## Changelog
-### v1.3.0 - 2020-10-12:
+### v1.3.1 - 2020-10-12:
 - changed the order of media query and regular CSS.
 - added media query between device widths.
 
