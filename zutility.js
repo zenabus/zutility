@@ -1,5 +1,5 @@
 /*!
- * Zutility v1.3.1
+ * Zutility v1.3.2
  *
  * https://github.com/zenabus
  *
@@ -547,7 +547,7 @@ document.addEventListener("DOMContentLoaded", function () {
     'sm': '(max-width: 767.8px)',
     'md': '(max-width: 991.8px)',
     'lg': '(max-width: 1199.8px)',
-    'xl': '(min-width: 1200px)',
+    'xl': '(max-width: 9999px)'
   }
 
   const fn = {
@@ -583,43 +583,38 @@ document.addEventListener("DOMContentLoaded", function () {
       }
       return [val, prop];
     },
-    saveRule: (cn, prop, val, mq = false) => {
+    saveRule: (cn, ncn, prop, val, mq = false) => {
       let isImportant;
       [val, isImportant] = fn.isValImportant(val);
-      [val, prop] = fn.getValAndProp(prop, val, cn);
+      [val, prop] = fn.getValAndProp(prop, val, ncn);
       val = isImportant ? `${val} !important` : val;
 
       if (mq) {
       	var [mq, vp] = mq.split('@');
-      	const rule = `@media ${mq} {.${cn} {${prop}: ${val}; }}`;
+      	const rule = `@media ${mq} {.${ncn} {${prop}: ${val}; }}`;
       	if(vp.length==2){
       		viewPorts[vp].push(rule)
       	} else {
       		mediaQueryCSS.push(rule);
       	}
       } else {
-        regularCSS.push(`.${cn} {${prop}: ${val}}`);
+        regularCSS.push(`.${ncn} {${prop}: ${val}}`);
       }
-    },
-    ruleExist: selector => {
-      for (const iterator of style.sheet.rules) {
-        const isMediaRule = iterator.cssRules != undefined;
-        if (isMediaRule && selector == iterator.cssRules[0].selectorText) {
-          return true;
-        } else if (selector == iterator.selectorText) {
-          return true;
-        }
-      }
+
+      classNames.push(cn);
     },
     insertRules: () => {
     	mediaQueryCSS.map(rc=>style.sheet.insertRule(rc));
 		  for(let vp in viewPorts){
 		  	viewPorts[vp].map(rc=>style.sheet.insertRule(rc))
-		  }
-		  regularCSS.map(rc=>style.sheet.insertRule(rc));
+      }
+		  regularCSS.map(rc=>{
+        style.sheet.insertRule(rc);
+      });
     }
   }
 
+  const classNames = [];
   const regularCSS = [];
   const mediaQueryCSS = [];
   const viewPorts = {
@@ -637,29 +632,29 @@ document.addEventListener("DOMContentLoaded", function () {
   for (const el of els) {
     for (let className of el.classList) {
       if (className.indexOf(':') != -1) {
-      	className = className.toLowerCase();
+        className = className.toLowerCase();
 	      const replaceChars = {':': '\\:', '#': '\\#', '\.': '\\.', '!': '\\!', '@': '\\@'}
 	      const newClassName = className.replace(/:|#|\.|!|@/g, char => replaceChars[char]);
-	      let mediaQuery = false;
+        let mediaQuery = false;
 
-	      if(!fn.ruleExist(`.${newClassName}`)){
-	        if (fn.isClassMedia(className)) {
-	          if (fn.isClassRegular(className.substr(className.split(':')[0].length + 1))) {
-	            var [mediaRule, prop, val] = className.split(':');
-	          } else {
-	            var [mediaRule, prop, bwidth, bstyle, bcolor] = className.split(':');
-	            var val = `${bwidth} ${CONSTANT_VALS['border-style'][bstyle]} ${bcolor}`;
-	          }
-	          mediaQuery = MEDIA_QUERIES[mediaRule.substr(1)]+mediaRule;
-	        } else if (fn.isClassRegular(className)) {
-	          var [prop, val] = className.split(':');
-	        } else if (fn.isClassBorder(className)) {
-	          var [prop, bwidth, bstyle, bcolor] = className.split(':');
-	          var val = `${bwidth} ${CONSTANT_VALS['border-style'][bstyle]} ${bcolor}`;
-	        }
-	      }
+        if(!classNames.includes(className)){
+          if (fn.isClassMedia(className)) {
+            if (fn.isClassRegular(className.substr(className.split(':')[0].length + 1))) {
+              var [mediaRule, prop, val] = className.split(':');
+            } else {
+              var [mediaRule, prop, bwidth, bstyle, bcolor] = className.split(':');
+              var val = `${bwidth} ${CONSTANT_VALS['border-style'][bstyle]} ${bcolor}`;
+            }
+            mediaQuery = MEDIA_QUERIES[mediaRule.substr(1)]+mediaRule;
+          } else if (fn.isClassRegular(className)) {
+            var [prop, val] = className.split(':');
+          } else if (fn.isClassBorder(className)) {
+            var [prop, bwidth, bstyle, bcolor] = className.split(':');
+            var val = `${bwidth} ${CONSTANT_VALS['border-style'][bstyle]} ${bcolor}`;
+          }
 
-	      fn.saveRule(newClassName, prop, val, mediaQuery);
+          fn.saveRule(className, newClassName, prop, val, mediaQuery);
+        }
       }
     }
   }
