@@ -595,7 +595,7 @@ document.addEventListener("DOMContentLoaded", function () {
       	var [mq, vp] = mq.split('@');
       	const rule = `@media ${mq} {.${ncn} {${prop}: ${val}; }}`;
       	if(vp.length==2){
-      		viewPorts[vp].push(rule)
+      		viewPorts[vp].push(rule);
       	} else {
       		mediaQueryCSS.push(rule);
       	}
@@ -606,12 +606,17 @@ document.addEventListener("DOMContentLoaded", function () {
       classNames.push(cn);
     },
     insertRules: () => {
-    	mediaQueryCSS.map(rc=>style.sheet.insertRule(rc));
-		  for(let vp in viewPorts){
-		  	viewPorts[vp].map(rc=>style.sheet.insertRule(rc))
+      const err = 'Invalid zutility syntax found: query skipped.';
+      mediaQueryCSS.map(rc=> {
+        try { style.sheet.insertRule(rc); } catch(e){ console.error(err); }
+      });
+      for(let vp in viewPorts){
+        viewPorts[vp].map(rc=> {
+          try { style.sheet.insertRule(rc); } catch(e){ console.error(err); }
+        });
       }
-		  regularCSS.map(rc=>{
-        style.sheet.insertRule(rc);
+      regularCSS.map(rc=>{
+        try { style.sheet.insertRule(rc); } catch(e){ console.error(err); }
       });
     }
   }
