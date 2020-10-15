@@ -1,5 +1,5 @@
 /*!
- * Zutility v1.3.2
+ * Zutility v1.3.3
  *
  * https://github.com/zenabus
  *
@@ -82,6 +82,7 @@ document.addEventListener("DOMContentLoaded", function () {
     bc: 'border-color',
     bg: 'background',
     br: 'border-radius',
+    bs: 'box-shadow',
     c: 'color',
     ti: 'text-indent',
     f: 'flex',
@@ -561,6 +562,7 @@ document.addEventListener("DOMContentLoaded", function () {
     isPropBorder: prop => Object.keys(BORDER_PROPS).indexOf(prop) > -1,
     isClassRegular: cn => (cn.match(/:/g) || []).length == 1,
     isClassBorder: cn => (cn.match(/:/g) || []).length == 3,
+    isClassBoxShadow: cn => (cn.match(/:/g) || []).length == 5,
     isClassMedia: cn => cn.startsWith('@'),
     isValColor: val => CSS_COLORS.map(c => c.toLowerCase()).includes(val.replace('!', '')),
     isValImportant: val => val.endsWith('!') ? [val.slice(0, -1), true] : [val, false],
@@ -651,6 +653,10 @@ document.addEventListener("DOMContentLoaded", function () {
           } else if (fn.isClassBorder(className)) {
             var [prop, bwidth, bstyle, bcolor] = className.split(':');
             var val = `${bwidth} ${CONSTANT_VALS['border-style'][bstyle]} ${bcolor}`;
+          } else if (fn.isClassBoxShadow(className)) {
+            var [prop, h, v, blur, spread, color] = className.split(':');
+            console.log(prop, h, v, blur, spread, color);
+            var val = `${h} ${v} ${blur} ${spread} ${color}`;
           }
 
           fn.saveRule(className, newClassName, prop, val, mediaQuery);

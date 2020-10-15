@@ -3,8 +3,8 @@
 
 <p align="center">A simple and light-weight JavaScript-based CSS utility library.</p>
 <p align="center">
-  <img src="https://img.shields.io/badge/js%20minified-8.55kb-green" />
-  <img src="https://img.shields.io/badge/js-15.8kb-blue" />
+  <img src="https://img.shields.io/badge/js%20minified-8.73kb-green" />
+  <img src="https://img.shields.io/badge/js-16.1kb-blue" />
 </p>
 
 ## Usage
@@ -123,6 +123,10 @@ Use ini for initial and inh for inherit values.
 [Live demo at CodePen.io](https://codepen.io/zenabus/pen/) [in progress]
 
 ## Changelog
+
+### v1.3.3 - 2020-10-16:
+- added box-shadow property.
+
 ### v1.3.2 - 2020-10-12:
 - removed ruleExist function.
 - fixed minor bugs.
