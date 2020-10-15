@@ -3,8 +3,8 @@
 
 <p align="center">A simple and light-weight JavaScript-based CSS utility library.</p>
 <p align="center">
-  <img src="https://img.shields.io/badge/js%20minified-8.73kb-green" />
-  <img src="https://img.shields.io/badge/js-16.1kb-blue" />
+  <img src="https://img.shields.io/badge/js%20minified-8.88kb-green" />
+  <img src="https://img.shields.io/badge/js-16.4kb-blue" />
 </p>
 
 ## Usage
@@ -126,6 +126,7 @@ Use ini for initial and inh for inherit values.
 
 ### v1.3.3 - 2020-10-16:
 - added box-shadow property.
+- added media query to box-shadow.
 
 ### v1.3.2 - 2020-10-12:
 - removed ruleExist function.

@@ -643,9 +643,12 @@ document.addEventListener("DOMContentLoaded", function () {
           if (fn.isClassMedia(className)) {
             if (fn.isClassRegular(className.substr(className.split(':')[0].length + 1))) {
               var [mediaRule, prop, val] = className.split(':');
-            } else {
+            } else if(fn.isClassBorder(className.substr(className.split(':')[0].length + 1))) {
               var [mediaRule, prop, bwidth, bstyle, bcolor] = className.split(':');
               var val = `${bwidth} ${CONSTANT_VALS['border-style'][bstyle]} ${bcolor}`;
+            } else if(fn.isClassBoxShadow(className.substr(className.split(':')[0].length + 1))) {
+              var [mediaRule, prop, h, v, blur, spread, color] = className.split(':');
+              var val = `${h} ${v} ${blur} ${spread} ${color}`;
             }
             mediaQuery = MEDIA_QUERIES[mediaRule.substr(1)]+mediaRule;
           } else if (fn.isClassRegular(className)) {
@@ -655,7 +658,6 @@ document.addEventListener("DOMContentLoaded", function () {
             var val = `${bwidth} ${CONSTANT_VALS['border-style'][bstyle]} ${bcolor}`;
           } else if (fn.isClassBoxShadow(className)) {
             var [prop, h, v, blur, spread, color] = className.split(':');
-            console.log(prop, h, v, blur, spread, color);
             var val = `${h} ${v} ${blur} ${spread} ${color}`;
           }
 
